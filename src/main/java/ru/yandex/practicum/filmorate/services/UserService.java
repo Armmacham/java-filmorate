@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.services;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.Map;
 @Component
 @Slf4j
 @AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class UserService {
 
     private final Map<Integer, User> users = new HashMap<>();

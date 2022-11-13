@@ -17,7 +17,7 @@ public class Film {
     @NotBlank(message = "name can not be blank")
     private String name;
 
-    @Length(message = "description can not be more then 200")
+    @Length(min = 1, max = 200, message = "description can not be more then 200")
     private String description;
 
     @CorrectReleaseDate(message = "releaseDate must be after 28-DEC-1895")
@@ -26,12 +26,12 @@ public class Film {
     @PositiveOrZero(message = "duration can not be negative")
     private int duration;
 
-    /*public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-    }*/
+    }
 
 }
