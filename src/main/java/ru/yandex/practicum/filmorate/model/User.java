@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotations.CorrectLogin;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.PositiveOrZero;
-import java.time.Instant;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
 
+@AllArgsConstructor
 @Data
 public class User {
 
@@ -23,17 +22,10 @@ public class User {
     @CorrectLogin
     private String login;
 
-    @NotBlank(message = "name must not be empty")
+    @NotEmpty(message = "name must not be empty")
+    @NotBlank(message = "name must not be blank")
     private String name;
 
     @Past(message = "birthday can not be in present or future")
-    private Instant birthday;
-
-    public User(int id, String email, String login, String name, Instant birthday) {
-        this.id = id;
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
+    private LocalDate birthday;
 }

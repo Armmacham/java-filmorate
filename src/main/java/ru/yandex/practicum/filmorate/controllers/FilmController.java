@@ -20,20 +20,26 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        log.info("Film added");
+        if (filmService.getAllFilms().containsKey(film.getId())) {
+            throw new RuntimeException("Такой фильм уже существует");
+        }
+        filmService.validateReleaseDate(film, "Фильм добавлен");
         return filmService.addFilm(film);
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        List<Film> filmsList= new ArrayList<>(filmService.getFilms().values());
+        List<Film> filmsList= new ArrayList<>(filmService.getAllFilms().values());
         log.debug("Количество фильмов: {}", filmsList.size());
         return filmsList;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        log.info("Film updated");
+        if (!filmService.getAllFilms().containsKey(film.getId())) {
+            throw new RuntimeException("Такого фильма нет в хранилище");
+        }
+        filmService.validateReleaseDate(film, "Данные фильма обновлены");
         return filmService.updateFilm(film);
     }
 }

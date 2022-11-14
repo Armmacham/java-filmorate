@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.User;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.services.UserService;
 
@@ -11,7 +10,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
@@ -21,20 +19,27 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
-        List<User> usersList = new ArrayList<>(userService.getUsers().values());
+        List<User> usersList = new ArrayList<>(userService.getAllUsers().values());
         log.debug("Количество пользователей: {}", usersList.size());
         return usersList;
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        log.info("User added");
+        if (userService.getAllUsers().containsKey(user.getId())) {
+            throw new RuntimeException("Такой пользователь уже существует");
+        }
+        userService.setUserNameByLogin(user, "Пользователь добавлен");
         return userService.addUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        log.info("User updated");
+        if (!userService.getAllUsers().containsKey(user.getId())) {
+            throw new RuntimeException("Такого пользователя не существует");
+        }
+        userService.setUserNameByLogin(user, "Данные пользователя обновлены");
         return userService.updateUser(user);
     }
+
 }
