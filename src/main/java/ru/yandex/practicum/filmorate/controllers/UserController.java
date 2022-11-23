@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.services.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,27 +18,21 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
-        List<User> usersList = new ArrayList<>(userService.getAllUsers().values());
-        log.debug("Количество пользователей: {}", usersList.size());
-        return usersList;
+        log.debug("Количество пользователей: {}", userService.getAllUsers().size());
+        return userService.getAllUsers();
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        if (userService.getAllUsers().containsKey(user.getId())) {
-            throw new RuntimeException("Такой пользователь уже существует");
-        }
-        userService.setUserNameByLogin(user, "Пользователь добавлен");
+        log.debug("Пользователь {} добавлен", user);
         return userService.addUser(user);
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-        if (!userService.getAllUsers().containsKey(user.getId())) {
-            throw new RuntimeException("Такого пользователя не существует");
-        }
-        userService.setUserNameByLogin(user, "Данные пользователя обновлены");
+    public User updateUser(@Valid @RequestBody User user) {
+        log.debug("Данные пользователя {} обновлены", user);
         return userService.updateUser(user);
     }
+
 
 }

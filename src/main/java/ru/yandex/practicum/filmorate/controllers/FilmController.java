@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,26 +19,19 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        if (filmService.getAllFilms().containsKey(film.getId())) {
-            throw new RuntimeException("Такой фильм уже существует");
-        }
-        filmService.validateReleaseDate(film, "Фильм добавлен");
+        log.debug("Фильм {} добавлен", film);
         return filmService.addFilm(film);
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        List<Film> filmsList= new ArrayList<>(filmService.getAllFilms().values());
-        log.debug("Количество фильмов: {}", filmsList.size());
-        return filmsList;
+        log.debug("Количество фильмов: {}", filmService.getAllFilms());
+        return filmService.getAllFilms();
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
-        if (!filmService.getAllFilms().containsKey(film.getId())) {
-            throw new RuntimeException("Такого фильма нет в хранилище");
-        }
-        filmService.validateReleaseDate(film, "Данные фильма обновлены");
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.debug("Фильм {} обновлён", film);
         return filmService.updateFilm(film);
     }
 }

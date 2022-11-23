@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import ru.yandex.practicum.filmorate.annotations.CorrectReleaseDate;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 
 @AllArgsConstructor
 @Data
+@ToString
 public class Film {
 
     @PositiveOrZero(message = "id cant not be negative")
@@ -27,4 +29,5 @@ public class Film {
 
     @PositiveOrZero(message = "duration can not be negative")
     private int duration;
+
 }
