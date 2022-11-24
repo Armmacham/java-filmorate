@@ -153,17 +153,6 @@ class FilmorateApplicationTests {
         }
     }
 
-    /*@Test
-    public void shouldValidateReleaseDate() {
-        FilmStorage filmStorage = new FilmStorage();
-        FilmService filmService = new FilmService(filmStorage);
-        Film film = new Film(1, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90);
-        String text = "Text";
-        ;
-        String result = (text + ":" + film.getName());
-        assertEquals(result, filmService.validateReleaseDate(film, "Text"));
-    }*/
-
     //Тесты для UserService
     @Test
     public void shouldNotAddUserIfIdAlreadyExist() {
@@ -240,6 +229,6 @@ class FilmorateApplicationTests {
         User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1));
         UserService userService = new UserService(userStorage);
         userService.addUser(user);
-        assertEquals("User_1", userService.getAllUsers().get(0).getName());
+        assertEquals("Max", userService.getAllUsers().get(0).getName());
     }
 }
