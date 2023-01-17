@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.annotations.CorrectLogin;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @Data
@@ -28,4 +30,29 @@ public class User {
 
     @Past(message = "birthday can not be in present or future")
     private LocalDate birthday;
+
+    private Set<Integer> friends;
+
+    public void addFriend(Integer id) {
+        if (friends == null) {
+            friends = new HashSet<>();
+        }
+        friends.add(id);
+    }
+
+    public void removeFriend(Integer id) {
+        if (friends == null) {
+            throw new RuntimeException("Список друзей пуст");
+        } else if (!friends.contains(id)) {
+            throw new RuntimeException("Такого друга не найдено");
+        }
+        friends.remove(id);
+    }
+
+    public Set<Integer> getAllFriendsId() {
+        if (friends == null) {
+            throw new RuntimeException("Список друзей пуст");
+        }
+        return friends;
+    }
 }

@@ -9,6 +9,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @Data
@@ -30,4 +32,16 @@ public class Film {
     @PositiveOrZero(message = "duration can not be negative")
     private int duration;
 
+    private Set<Integer> likesCount;
+
+    public void addLike(Integer userId) {
+        if (likesCount == null) {
+            likesCount = new HashSet<>();
+        }
+        likesCount.add(userId);
+    }
+
+    public void removeLike(Integer userId) {
+        likesCount.remove(userId);
+    }
 }
