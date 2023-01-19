@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.validators.user;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -59,9 +59,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getUserFriends(Integer userId) {
-        if (!users.containsKey(id)) {
-            throw new UserNotFoundException(String.format("Пользователь с id номером %d не найден", id));
-        }
         return users.get(userId).getFriends()
                 .stream()
                 .map(users::get)

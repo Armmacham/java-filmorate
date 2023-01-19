@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.ToString;
 import ru.yandex.practicum.filmorate.annotations.CorrectReleaseDate;
 import lombok.Data;
@@ -10,9 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@AllArgsConstructor
 @Data
 @ToString
 public class Film {
@@ -33,6 +32,14 @@ public class Film {
     private int duration;
 
     private Set<Integer> likesCount;
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, Set<Integer> likesCount) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.likesCount = Objects.requireNonNullElseGet(likesCount, HashSet::new);
+    }
 
     public void addLike(Integer userId) {
         if (likesCount == null) {

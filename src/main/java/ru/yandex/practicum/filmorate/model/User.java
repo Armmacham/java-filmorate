@@ -42,7 +42,7 @@ public class User {
 
     public void removeFriend(Integer id) {
         if (friends == null) {
-            throw new RuntimeException("Список друзей пуст");
+            friends = new HashSet<>();
         } else if (!friends.contains(id)) {
             throw new RuntimeException("Такого друга не найдено");
         }
@@ -51,7 +51,7 @@ public class User {
 
     public Set<Integer> getAllFriendsId() {
         if (friends == null) {
-            throw new RuntimeException("Список друзей пуст");
+            friends = new HashSet<>();
         }
         return friends;
     }

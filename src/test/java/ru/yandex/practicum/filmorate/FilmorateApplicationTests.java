@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.validators.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -28,7 +28,7 @@ class FilmorateApplicationTests {
     // Тесты для FilmStorage
     @Test
     void shouldAddLike() {
-        Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, null);
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, null);
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         inMemoryFilmStorage.addFilm(film);
         User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), null);
@@ -48,21 +48,21 @@ class FilmorateApplicationTests {
 
     @Test
     void shouldAddFilm() {
-        Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         inMemoryFilmStorage.addFilm(film);
-        assertNotNull(inMemoryFilmStorage.getFilms());
+        assertNotNull(inMemoryFilmStorage.getAllFilms());
     }
 
     @Test
     void shouldUpdateFilm() {
-        Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         inMemoryFilmStorage.addFilm(film);
-        Film ChangedFilm = new Film(film.getId(), "Film_1", "Description", LocalDate.of(1991, 11, 1), 120, Set.of(1, 2));
-        inMemoryFilmStorage.update(ChangedFilm);
-        Map<Integer, Film> films = inMemoryFilmStorage.getFilms();
-        assertEquals(ChangedFilm.getDuration(), films.get(film.getId()).getDuration());
+        Film changedFilm = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 120, Set.of(1, 2));
+        changedFilm.setId(film.getId());
+        inMemoryFilmStorage.update(changedFilm);
+        assertEquals(changedFilm.getDuration(), inMemoryFilmStorage.getFilmById(film.getId()).getDuration());
     }
 
     // Тесты для UserStorage
@@ -99,10 +99,11 @@ class FilmorateApplicationTests {
         try {
             InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-            Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+            Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
             FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
             filmService.addFilm(film);
-            Film film_2 = new Film(film.getId(), "Film_2", "Description_2", LocalDate.of(2002, 11, 1), 60, Set.of(1));
+            Film film_2 = new Film("Film_2", "Description_2", LocalDate.of(2002, 11, 1), 60, Set.of(1));
+            film_2.setId(film.getId());
             filmService.addFilm(film_2);
             fail("Should have thrown an exception");
         } catch (Exception e) {
@@ -114,7 +115,7 @@ class FilmorateApplicationTests {
     void shouldAddFilmService() {
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
         FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
         int initialListSize = filmService.getAllFilms().size();
         filmService.addFilm(film);
@@ -126,8 +127,8 @@ class FilmorateApplicationTests {
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
         FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
-        Film film = new Film(0, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
-        Film film_2 = new Film(0, "Film_2", "Description_2", LocalDate.of(2002, 11, 1), 60, Set.of(1));
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+        Film film_2 = new Film("Film_2", "Description_2", LocalDate.of(2002, 11, 1), 60, Set.of(1));
         filmService.addFilm(film);
         filmService.addFilm(film_2);
         assertEquals(List.of(film, film_2), filmService.getAllFilms());
@@ -139,7 +140,7 @@ class FilmorateApplicationTests {
             InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
             FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
-            Film film = new Film(1, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+            Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
             filmService.updateFilm(film);
             fail("Should have thrown an exception");
         } catch (Exception e) {
@@ -152,7 +153,7 @@ class FilmorateApplicationTests {
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
         FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
-        Film film = new Film(1, "Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
+        Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, Set.of(1, 2));
         filmService.addFilm(film);
         film.setDuration(100);
         filmService.updateFilm(film);
@@ -165,7 +166,7 @@ class FilmorateApplicationTests {
             InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
             FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
-            Film film = new Film(1, "Film_1", "Description", LocalDate.of(1000, 11, 1), 90, Set.of(1, 2));
+            Film film = new Film("Film_1", "Description", LocalDate.of(1000, 11, 1), 90, Set.of(1, 2));
             filmService.validateReleaseDate(film, "Text");
         } catch (ValidationException e) {
             assertTrue(true);
