@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -49,7 +48,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopRatedFilms(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
+    public List<Film> getTopRatedFilms(@RequestParam(value = "count", defaultValue = "10") Integer count) {
         return filmService.getTopRatedFilms(count);
     }
 }

@@ -34,7 +34,8 @@ class FilmorateApplicationTests {
         User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), null);
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
         inMemoryUserStorage.addUser(user);
-        inMemoryFilmStorage.addLike(film.getId(), user.getId());
+        FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
+        filmService.addLike(film.getId(), user.getId());
         assertEquals(1, film.getLikesCount().size());
     }
 

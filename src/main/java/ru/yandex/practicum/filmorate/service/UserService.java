@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,13 +61,24 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Integer userId) {
-        return userStorage.getUserFriends(userId);
+        User user = userStorage.getUserById(userId);
+
+        List<User> usersList = userStorage.getAllUsers();
+
+        Map<Integer, User> usersMap = usersList.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+        return user.getFriends()
+                .stream()
+                .map(usersMap::get)
+                .collect(Collectors.toList());
     }
 
     public Set<User> getMutualFriends(Integer firstUserId, Integer secondUserId) {
+        Set otherFriendsId = getUserById(secondUserId).getAllFriendsId();
+
         return getUserById(firstUserId).getAllFriendsId()
                 .stream()
-                .filter(getUserById(secondUserId).getAllFriendsId()::contains)
+                .filter(otherFriendsId::contains)
                 .map(this::getUserById)
                 .collect(Collectors.toSet());
     }

@@ -21,45 +21,18 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({EntityAlreadyExistsException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleFilmAlreadyExists(final FilmAlreadyExistsException e) {
+    public ErrorResponse alreadyExistsHandler(final RuntimeException e) {
         log.info(e.getMessage());
         return new ErrorResponse(
                 e.getMessage()
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmNotFound(final FilmNotFoundException e) {
-        log.info(e.getMessage());
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleUserAlreadyExists(final UserAlreadyExistsException e) {
-        log.info(e.getMessage());
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFound(final UserNotFoundException e) {
-        log.info(e.getMessage());
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
+    public ErrorResponse notFoundHandler(final RuntimeException e) {
         log.info(e.getMessage());
         return new ErrorResponse(
                 e.getMessage()

@@ -42,9 +42,6 @@ public class Film {
     }
 
     public void addLike(Integer userId) {
-        if (likesCount == null) {
-            likesCount = new HashSet<>();
-        }
         likesCount.add(userId);
     }
 
