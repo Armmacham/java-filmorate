@@ -12,6 +12,7 @@ public class FilmReleaseDateValidator implements ConstraintValidator<CorrectRele
         return localDate.isAfter(LocalDate.of(1895, 12, 28));
     }
 
+    @Override
     public void initialize(CorrectReleaseDate constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
