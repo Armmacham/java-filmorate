@@ -10,9 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Getter
 public class InMemoryUserStorage implements UserStorage {
-    public Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     public static int id;
 
@@ -55,5 +54,27 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getAllUsers() {
         List<User> allUsers = new ArrayList<>(users.values());
         return allUsers;
+    }
+
+    @Override
+    public boolean deleteUser(User user) {
+        users.remove(user.getId());
+        return true;
+    }
+
+    @Override
+    public boolean addFriend(int userId, int friendId) {
+        User user = users.get(userId);
+        User friend = users.get(friendId);
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+        updateUser(user);
+        updateUser(friend);
+        return true;
+    }
+
+    @Override
+    public boolean deleteFriend(int userId, int friendId) {
+        return false;
     }
 }

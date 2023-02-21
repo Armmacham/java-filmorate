@@ -1,26 +1,38 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
+import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class FilmService {
 
+    private static int increment = 0;
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
+
+    private final Validator validator;
+
+    @Autowired
+    public FilmService(Validator validator, @Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService) {
+       this.validator = validator;
+        this.filmStorage = filmStorage;
+        this.userService = userService;
+    }
 
     private static final LocalDate START_DATA = LocalDate.of(1895, 12, 28);
 
@@ -41,7 +53,7 @@ public class FilmService {
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        userStorage.getUserById(userId);
+        userService.getUserById(userId);
         getFilmById(filmId).addLike(userId);
         log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, filmId);
     }
@@ -70,4 +82,49 @@ public class FilmService {
         }
         log.debug("{}: {}", text, film.getName());
     }
+
+    /*public Film getFilm(String id) {
+        return getStoredFilm(id);
+    }
+
+    private void validate(Film film) {
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        if (!violations.isEmpty()) {
+            StringBuilder messageBuilder = new StringBuilder();
+            for (ConstraintViolation<Film> filmConstraintViolation : violations) {
+                messageBuilder.append(filmConstraintViolation.getMessage());
+            }
+            throw new ValidationException("Ошибка валидации Фильма: " + messageBuilder, (Throwable) violations);
+        }
+        if (film.getId() == 0) {
+            film.setId(getNextId());
+        }
+    }*/
+
+    /*private static int getNextId() {
+        return ++increment;
+    }
+
+    private Integer intFromString(final String supposedInt) {
+        try {
+            return Integer.valueOf(supposedInt);
+        } catch (NumberFormatException exception) {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private Film getStoredFilm(final String supposedId) {
+        final int filmId = intFromString(supposedId);
+        if (filmId == Integer.MIN_VALUE) {
+            throw new IncorrectParameterException("Не удалось распознать идентификатор фильма: " +
+                    "значение " + supposedId);
+        }
+        Film film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            throw new EntityNotFoundException("Фильм с идентификатором " +
+                    filmId + " не зарегистрирован!");
+        }
+        return film;
+    }*/
 }
+

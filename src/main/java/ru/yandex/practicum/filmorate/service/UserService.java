@@ -1,30 +1,44 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class UserService {
     private final UserStorage userStorage;
 
-    public User addUser(User user) {
+    private int increment = 0;
+
+    private final Validator validator;
+
+    @Autowired
+    public UserService(Validator validator, @Qualifier("UserDbStorage") UserStorage userStorage) {
+        this.validator = validator;
+        this.userStorage = userStorage;
+    }
+
+    public User addUser(final User user) {
+        if (validator.validate(user).size() > 0) { // Todo: create new service to validate this
+            throw new ValidationException();
+        }
         setUserNameByLogin(user, "Добавлен пользователь");
         return userStorage.addUser(user);
     }
 
-    public User updateUser(User user) {
+    public User updateUser(final User user) {
         setUserNameByLogin(user, "Обновлён пользователь");
         return userStorage.updateUser(user);
     }
@@ -40,27 +54,27 @@ public class UserService {
         log.debug("{}: {}, email: {}", text, user.getName(), user.getEmail());
     }
 
-    public User getUserById(Integer userId) {
+    public User getUserById(final Integer userId) {
         return userStorage.getUserById(userId);
     }
 
-    public void addFriend(Integer userId, Integer friendId) {
+    public void addFriend(final Integer userId, final Integer friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
         user.addFriend(friendId);
         friend.addFriend(userId);
+        userStorage.addFriend(userId, friendId);
         log.debug("Пользователь с id {} добавил в список друзей пользователя с id {}", userId, friendId);
     }
 
-    public void removeFriend(Integer userId, Integer friendId) {
+    public void removeFriend(final Integer userId, final Integer friendId) {
         User user = getUserById(userId);
-        User friend = getUserById(friendId);
         user.removeFriend(friendId);
-        friend.removeFriend(userId);
+        userStorage.deleteFriend(userId, friendId);
         log.debug("Пользователь с id {} удалил из списка друзей пользователя с id {}", userId, friendId);
     }
 
-    public List<User> getUserFriends(Integer userId) {
+    public List<User> getUserFriends(final Integer userId) {
         User user = userStorage.getUserById(userId);
 
         List<User> usersList = userStorage.getAllUsers();
@@ -73,13 +87,17 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Set<User> getMutualFriends(Integer firstUserId, Integer secondUserId) {
-        Set otherFriendsId = getUserById(secondUserId).getAllFriendsId();
+    public List<User> getMutualFriends(final Integer firstUserId, final Integer secondUserId) {
+        List otherFriendsId = getUserById(secondUserId).getAllFriendsId();
 
         return getUserById(firstUserId).getAllFriendsId()
                 .stream()
                 .filter(otherFriendsId::contains)
                 .map(this::getUserById)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+    }
+
+    public boolean deleteUser(final User user) {
+        return userStorage.deleteUser(user);
     }
 }

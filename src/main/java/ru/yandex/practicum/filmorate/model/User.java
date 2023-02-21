@@ -2,16 +2,18 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import ru.yandex.practicum.filmorate.annotations.CorrectLogin;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @ToString
 public class User {
@@ -32,13 +34,13 @@ public class User {
     @Past(message = "birthday can not be in present or future")
     private LocalDate birthday;
 
-    private Set<Integer> friends;
+    private List<Integer> friends;
 
-    public Set checkFriendsList() {
+    public List<Integer> checkFriendsList() {
         if (friends != null) {
             return friends;
         }
-        friends = new HashSet<>();
+        friends = new ArrayList<>();
         return friends;
     }
 
@@ -55,7 +57,7 @@ public class User {
         friends.remove(id);
     }
 
-    public Set<Integer> getAllFriendsId() {
+    public List<Integer> getAllFriendsId() {
         checkFriendsList();
         return friends;
     }

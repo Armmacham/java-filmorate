@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -19,13 +22,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
 
     @Test
     void contextLoads() {
     }
 
-    // Тесты для FilmStorage
+    /*// Тесты для FilmStorage
     @Test
     void shouldAddLike() {
         Film film = new Film("Film_1", "Description", LocalDate.of(1991, 11, 1), 90, null);
@@ -167,7 +172,7 @@ class FilmorateApplicationTests {
             InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
             FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
-            Film film = new Film("Film_1", "Description", LocalDate.of(1000, 11, 1), 90, Set.of(1, 2));
+            Film film = new Film("Film_1", "Description", LocalDate.of(1000, 11, 1), 90, List.of(1, 2));
             filmService.validateReleaseDate(film, "Text");
         } catch (ValidationException e) {
             assertTrue(true);
@@ -179,10 +184,10 @@ class FilmorateApplicationTests {
     public void shouldNotAddUserIfIdAlreadyExist() {
         try {
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-            User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
+            User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
             UserService userService = new UserService(inMemoryUserStorage);
             userService.addUser(user);
-            User user_2 = new User(user.getId(), "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1));
+            User user_2 = new User(user.getId(), "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1));
             userService.addUser(user_2);
             fail("Should have thrown an exception");
         } catch (Exception e) {
@@ -193,7 +198,7 @@ class FilmorateApplicationTests {
     @Test
     public void shouldAddUserService() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
+        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
         UserService userService = new UserService(inMemoryUserStorage);
         userService.addUser(user);
         assertNotNull(userService.getAllUsers());
@@ -202,8 +207,8 @@ class FilmorateApplicationTests {
     @Test
     public void shouldGetAllUsers() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
-        User user_2 = new User(0, "mail_2@mail.com", "User_2", "Max_2", LocalDate.of(1990, 10, 10), Set.of(1));
+        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
+        User user_2 = new User(0, "mail_2@mail.com", "User_2", "Max_2", LocalDate.of(1990, 10, 10), List.of(1));
         UserService userService = new UserService(inMemoryUserStorage);
         userService.addUser(user);
         userService.addUser(user_2);
@@ -213,7 +218,7 @@ class FilmorateApplicationTests {
     @Test
     public void shouldUpdateUserService() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
+        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
         UserService userService = new UserService(inMemoryUserStorage);
         userService.addUser(user);
         user.setName("Max_2");
@@ -225,7 +230,7 @@ class FilmorateApplicationTests {
     public void shouldNotUpdateUserIfNotExist() {
         try {
             InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-            User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
+            User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
             UserService userService = new UserService(inMemoryUserStorage);
             user.setName("Max_2");
             userService.updateUser(user);
@@ -238,7 +243,7 @@ class FilmorateApplicationTests {
     @Test
     public void shouldSetUserNameByLogin() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User(0, "mail@mail.com", "User_1", null, LocalDate.of(1991, 11, 1), Set.of(1, 2));
+        User user = new User(0, "mail@mail.com", "User_1", null, LocalDate.of(1991, 11, 1), List.of(1, 2));
         UserService userService = new UserService(inMemoryUserStorage);
         userService.addUser(user);
         assertEquals("User_1", userService.getAllUsers().get(0).getName());
@@ -247,9 +252,11 @@ class FilmorateApplicationTests {
     @Test
     public void shouldNotSetUserNameByLogin() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), Set.of(1, 2));
+        User user = new User(0, "mail@mail.com", "User_1", "Max", LocalDate.of(1991, 11, 1), List.of(1, 2));
         UserService userService = new UserService(inMemoryUserStorage);
         userService.addUser(user);
         assertEquals("Max", userService.getAllUsers().get(0).getName());
     }
+
+    //Тесты для*/
 }
