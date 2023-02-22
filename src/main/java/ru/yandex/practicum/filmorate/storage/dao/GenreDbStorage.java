@@ -28,7 +28,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public boolean addFilmGenres(int filmId, Collection<Genre> genres) {
         for (Genre genre : genres) {
-            String setNewGenres = "insert into GENRELINE (FILMID, GENREID) values (?, ?)";
+            String setNewGenres = "insert into GENRELINE (FILMID, GENREID) values (?, ?) ON CONFLICT DO NOTHING;";
             jdbcTemplate.update(setNewGenres, filmId, genre.getId());
         }
         return true;
@@ -54,8 +54,7 @@ public class GenreDbStorage implements GenreStorage {
         Genre genre;
         try {
             genre = jdbcTemplate.queryForObject(sqlGenre, this::makeGenre, genreId);
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Жанр с идентификатором " +
                     genreId + " не зарегистрирован!");
         }

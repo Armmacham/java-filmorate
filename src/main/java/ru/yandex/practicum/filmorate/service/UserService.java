@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import java.util.*;
