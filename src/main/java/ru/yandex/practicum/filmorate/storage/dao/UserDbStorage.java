@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.sql.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Component("UserDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -25,7 +24,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User getUserById(Integer id) {
-        String sqlUser = "select * from USERS where USERID = ?";
+        String sqlUser = "select * from USERS where USER_ID = ?";
         User user;
         try {
             user = jdbcTemplate.queryForObject(sqlUser, (rs, rowNum) -> makeUser(rs), id);
@@ -44,10 +43,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) {
+    public int addUser(User user) {
         String sqlQuery = "insert into USERS " +
                 "(EMAIL, LOGIN, NAME, BIRTHDAY) " +
-                "values (?, ?, ?, ?)";
+                "values (?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -55,25 +54,17 @@ public class UserDbStorage implements UserStorage {
             preparedStatement.setString(2, user.getLogin());
             preparedStatement.setString(3, user.getName());
             preparedStatement.setDate(4, Date.valueOf(user.getBirthday()));
-
             return preparedStatement;
         }, keyHolder);
 
-        int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-
-        if (user.getFriends() != null) {
-            for (Integer friendId : user.getFriends()) {
-                addFriend(user.getId(), friendId);
-            }
-        }
-        return getUserById(id);
+        return Objects.requireNonNull(keyHolder.getKey()).intValue();
     }
 
     @Override
     public User updateUser(User user) {
         String sqlUser = "update USERS set " +
                 "EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? " +
-                "where USERID = ?";
+                "where USER_ID = ?";
         jdbcTemplate.update(sqlUser,
                 user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
 
@@ -81,24 +72,24 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        String sqlQuery = "delete from USERS where USERID = ?";
-        return jdbcTemplate.update(sqlQuery, user.getId()) > 0;
+    public boolean deleteUserById(int id) {
+        String sqlQuery = "delete from USERS where USER_ID = ?";
+        return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
     private User makeUser(ResultSet resultSet) throws SQLException {
-        int userId = resultSet.getInt("UserID");
+        int userId = resultSet.getInt("user_id");
         return new User(
                 userId,
-                resultSet.getString("Email"),
-                resultSet.getString("Login"),
-                resultSet.getString("Name"),
-                Objects.requireNonNull(resultSet.getDate("BirthDay")).toLocalDate(),
+                resultSet.getString("email"),
+                resultSet.getString("login"),
+                resultSet.getString("name"),
+                Objects.requireNonNull(resultSet.getDate("birthday")).toLocalDate(),
                 getUserFriends(userId));
     }
 
     private List<Integer> getUserFriends(Integer userId) {
-        String sqlGetFriends = "select FRIENDID from FRIENDSHIP where USERID = ?";
+        String sqlGetFriends = "select FRIEND_ID from FRIENDSHIP where USER_ID = ?";
         return jdbcTemplate.queryForList(sqlGetFriends, Integer.class, userId);
     }
 
@@ -106,15 +97,15 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(int userId, int friendId) {
         boolean friendAccepted;
         String sqlGetReversFriend = "select * from FRIENDSHIP " +
-                "where USERID = ? and FRIENDID = ?";
+                "where USER_ID = ? and FRIEND_ID = ?";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlGetReversFriend, friendId, userId);
         friendAccepted = sqlRowSet.next();
-        String sqlSetFriend = "insert into FRIENDSHIP (USERID, FRIENDID, STATUS) " +
+        String sqlSetFriend = "insert into FRIENDSHIP (USER_ID, FRIEND_ID, STATUS) " +
                 "VALUES (?,?,?)";
         jdbcTemplate.update(sqlSetFriend, userId, friendId, friendAccepted);
         if (friendAccepted) {
             String sqlSetStatus = "update FRIENDSHIP set STATUS = true " +
-                    "where USERID = ? and FRIENDID = ?";
+                    "where USER_ID = ? and FRIEND_ID = ?";
             jdbcTemplate.update(sqlSetStatus, friendId, userId);
         }
         return true;
@@ -122,10 +113,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean deleteFriend(int userId, int friendId) {
-        String sqlDeleteFriend = "delete from FRIENDSHIP where USERID = ? and FRIENDID = ?";
+        String sqlDeleteFriend = "delete from FRIENDSHIP where USER_ID = ? and FRIEND_ID = ?";
         jdbcTemplate.update(sqlDeleteFriend, userId, friendId);
         String sqlSetStatus = "update FRIENDSHIP set STATUS = false " +
-                "where USERID = ? and FRIENDID = ?";
+                "where USER_ID = ? and FRIEND_ID = ?";
         jdbcTemplate.update(sqlSetStatus, friendId, userId);
         return true;
     }

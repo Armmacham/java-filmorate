@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface FilmStorage {
-    Film addFilm(Film film);
+    Integer addFilm(Film film);
 
     Film update(Film film);
 
@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     List<Film> getAllFilms();
 
-    boolean deleteFilm(Film film);
+    boolean deleteFilm(Integer id);
 
     boolean addLike(int filmId, int userId);
 

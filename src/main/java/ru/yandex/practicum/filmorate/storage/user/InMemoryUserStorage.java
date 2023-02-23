@@ -20,14 +20,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) {
+    public int addUser(User user) {
         if (users.containsKey(user.getId())) {
             throw new EntityAlreadyExistsException(String.format("Пользователь с id номером %d уже существует", user.getId()));
         }
         int newId = generateId();
         user.setId(newId);
         users.put(newId, user);
-        return user;
+        return user.getId();
     }
 
     @Override
@@ -57,8 +57,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        users.remove(user.getId());
+    public boolean deleteUserById(int id) {
+        users.remove(id);
         return true;
     }
 

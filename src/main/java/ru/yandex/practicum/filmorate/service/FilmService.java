@@ -19,28 +19,43 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
 
+    private final GenreService genreService;
+
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService, GenreService genreService) {
         this.filmStorage = filmStorage;
         this.userService = userService;
+        this.genreService = genreService;
     }
 
-    private static final LocalDate START_DATA = LocalDate.of(1895, 12, 28);
-
     public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+        Integer film1 = filmStorage.addFilm(film);
+        genreService.addFilmGenres(film1, film.getGenres());
+        Film filmById = filmStorage.getFilmById(film1);
+        filmById.setGenres(genreService.getFilmGenres(film1));
+        return filmById;
     }
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        List<Film> allFilms = filmStorage.getAllFilms();
+        allFilms.forEach(f -> f.setGenres(genreService.getFilmGenres(f.getId())));
+        return allFilms;
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.update(film);
+        Film updated = filmStorage.update(film);
+        genreService.deleteFilmGenres(film.getId());
+        if (!film.getGenres().isEmpty()) {
+            genreService.addFilmGenres(film.getId(), film.getGenres());
+        }
+        updated.setGenres(genreService.getFilmGenres(updated.getId()));
+        return updated;
     }
 
     public Film getFilmById(Integer filmId) {
-        return filmStorage.getFilmById(filmId);
+        Film filmById = filmStorage.getFilmById(filmId);
+        filmById.setGenres(genreService.getFilmGenres(filmById.getId()));
+        return filmById;
     }
 
     public void addLike(Integer filmId, Integer userId) {
@@ -64,6 +79,7 @@ public class FilmService {
         return getAllFilms()
                 .stream()
                 .filter(film -> film.getLikesCount() != null)
+                .peek(film -> genreService.getFilmGenres(film.getId()))
                 .sorted((t1, t2) -> t2.getLikesCount().size() - t1.getLikesCount().size())
                 .limit(count)
                 .collect(Collectors.toList());

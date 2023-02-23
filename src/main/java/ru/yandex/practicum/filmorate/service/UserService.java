@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
-    private int increment = 0;
-
     private final Validator validator;
 
     @Autowired
@@ -29,11 +27,12 @@ public class UserService {
     }
 
     public User addUser(final User user) {
-        if (validator.validate(user).size() > 0) { // Todo: create new service to validate this
+        if (validator.validate(user).size() > 0) {
             throw new ValidationException();
         }
         setUserNameByLogin(user, "Добавлен пользователь");
-        return userStorage.addUser(user);
+        int id = userStorage.addUser(user);
+        return userStorage.getUserById(id);
     }
 
     public User updateUser(final User user) {
@@ -86,7 +85,7 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(final Integer firstUserId, final Integer secondUserId) {
-        List otherFriendsId = getUserById(secondUserId).getAllFriendsId();
+        List<Integer> otherFriendsId = getUserById(secondUserId).getAllFriendsId();
 
         return getUserById(firstUserId).getAllFriendsId()
                 .stream()
@@ -96,6 +95,6 @@ public class UserService {
     }
 
     public boolean deleteUser(final User user) {
-        return userStorage.deleteUser(user);
+        return userStorage.deleteUserById(user.getId());
     }
 }

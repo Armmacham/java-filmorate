@@ -29,10 +29,10 @@ public class UserDbStorageTests {
                 "Correct Name",
                 LocalDate.of(2016, 1, 1),
                 new ArrayList<>());
-        User addUser = userDbStorage.addUser(user);
-        User dbUser = userDbStorage.getUserById(addUser.getId());
-        assertThat(dbUser).hasFieldOrPropertyWithValue("id", addUser.getId());
-        userDbStorage.deleteUser(addUser);
+        int addUser = userDbStorage.addUser(user);
+        User dbUser = userDbStorage.getUserById(addUser);
+        assertThat(dbUser).hasFieldOrPropertyWithValue("id", addUser);
+        userDbStorage.deleteUserById(addUser);
     }
 
     @Test
@@ -49,12 +49,12 @@ public class UserDbStorageTests {
                 "Correct Name",
                 LocalDate.of(2016, 1, 1),
                 new ArrayList<>());
-        User addUser1 = userDbStorage.addUser(user1);
-        User addUser2 = userDbStorage.addUser(user2);
+        int addUser1 = userDbStorage.addUser(user1);
+        int addUser2 = userDbStorage.addUser(user2);
         Collection<User> dbUsers = userDbStorage.getAllUsers();
         assertEquals(2, dbUsers.size());
-        userDbStorage.deleteUser(addUser1);
-        userDbStorage.deleteUser(addUser2);
+        userDbStorage.deleteUserById(addUser1);
+        userDbStorage.deleteUserById(addUser2);
     }
 
     @Test
@@ -65,12 +65,13 @@ public class UserDbStorageTests {
                 "Correct Name",
                 LocalDate.of(2016, 1, 1),
                 new ArrayList<>());
-        User addedUser = userDbStorage.addUser(user);
-        addedUser.setName("Ivan");
-        userDbStorage.updateUser(addedUser);
-        User dbUser = userDbStorage.getUserById(addedUser.getId());
+        int addedUser = userDbStorage.addUser(user);
+        User userById = userDbStorage.getUserById(addedUser);
+        userById.setName("Ivan");
+        userDbStorage.updateUser(userById);
+        User dbUser = userDbStorage.getUserById(addedUser);
         assertThat(dbUser).hasFieldOrPropertyWithValue("name", "Ivan");
-        userDbStorage.deleteUser(addedUser);
+        userDbStorage.deleteUserById(addedUser);
     }
 
     @Test
@@ -87,12 +88,12 @@ public class UserDbStorageTests {
                 "Correct Name",
                 LocalDate.of(2016, 1, 1),
                 new ArrayList<>());
-        User addedUser1 = userDbStorage.addUser(user1);
-        User addedUser2 = userDbStorage.addUser(user2);
+        int addedUser1 = userDbStorage.addUser(user1);
+        int addedUser2 = userDbStorage.addUser(user2);
         Collection<User> beforeDelete = userDbStorage.getAllUsers();
-        userDbStorage.deleteUser(addedUser1);
+        userDbStorage.deleteUserById(addedUser1);
         Collection<User> afterDelete = userDbStorage.getAllUsers();
         assertEquals(beforeDelete.size() - 1, afterDelete.size());
-        userDbStorage.deleteUser(addedUser2);
+        userDbStorage.deleteUserById(addedUser2);
     }
 }

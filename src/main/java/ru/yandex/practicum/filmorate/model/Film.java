@@ -42,21 +42,6 @@ public class Film {
 
     private List<Integer> likesCount = new ArrayList<>();
 
-        /*public Film(int filmId, String name, String description, LocalDate releaseDate, int duration, int rating, Mpa mpa, List<Genre> filmGenres, List<Integer> filmLikes) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.likesCount = Objects.requireNonNullElseGet(likesCount, HashSet::new);
-    }*/
-
-    /*public Film(String name, String description, LocalDate releaseDate, int duration, int rate, Mpa mpa) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.likesCount = Objects.requireNonNullElseGet(likesCount, HashSet::new);
-    }*/
 
     public void addLike(Integer userId) {
         likesCount.add(userId);

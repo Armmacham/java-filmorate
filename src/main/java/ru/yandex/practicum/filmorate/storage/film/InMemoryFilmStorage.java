@@ -24,14 +24,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addFilm(Film film) {
+    public Integer addFilm(Film film) {
         if (films.containsKey(film.getId())) {
             throw new EntityAlreadyExistsException(String.format("Фильм с id номером %d уже существует", film.getId()));
         }
         int newId = generateId();
         film.setId(newId);
         films.put(newId, film);
-        return film;
+        return film.getId();
     }
 
     @Override
@@ -58,8 +58,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean deleteFilm(Film film) {
-        films.remove(film.getId());
+    public boolean deleteFilm(Integer id) {
+        films.remove(id);
         return true;
     }
 

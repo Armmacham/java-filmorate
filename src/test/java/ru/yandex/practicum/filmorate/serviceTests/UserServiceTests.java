@@ -110,4 +110,31 @@ class UserServiceTests {
             assertTrue(true);
         }
     }
+
+    @Test
+    void shouldAddFriend() {
+        User user_1 = new User(0,
+                "correct_email@mail.ru",
+                "correct_login",
+                "Correct_name",
+                LocalDate.of(2002, 1, 1),
+                new ArrayList<>());
+
+        User user_2 = new User(0,
+                "corrrect_email@mail.ru",
+                "correct_login",
+                "Correct_name_2",
+                LocalDate.of(2000, 2, 1),
+                new ArrayList<>());
+
+        User addedUser_1 = userService.addUser(user_1);
+        User addedUser_2 = userService.addUser(user_2);
+
+        addedUser_1.addFriend(addedUser_2.getId());
+
+        assertEquals(1, addedUser_1.getFriends().size());
+
+        userService.deleteUser(addedUser_1);
+        userService.deleteUser(addedUser_2);
+    }
 }
