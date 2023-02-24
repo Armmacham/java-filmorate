@@ -11,6 +11,8 @@ public interface UserStorage {
 
     User getUserById(Integer id);
 
+    List<User> getUserFriends(Integer id);
+
     List<User> getAllUsers();
 
     boolean deleteUserById(int id);

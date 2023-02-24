@@ -8,7 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.time.LocalDate;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,15 +21,20 @@ public class FilmService {
     private final UserService userService;
 
     private final GenreService genreService;
+    private final Validator validator;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService, GenreService genreService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService, GenreService genreService, Validator validator) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.genreService = genreService;
+        this.validator = validator;
     }
 
     public Film addFilm(Film film) {
+//        if (validator.validate(film).size() > 0 || validator.validate(film.getGenres()).size() > 0) {
+//            throw new ValidationException();
+//        }
         Integer film1 = filmStorage.addFilm(film);
         genreService.addFilmGenres(film1, film.getGenres());
         Film filmById = filmStorage.getFilmById(film1);
@@ -59,8 +65,6 @@ public class FilmService {
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        userService.getUserById(userId);
-        getFilmById(filmId).addLike(userId);
         filmStorage.addLike(filmId, userId);
         log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, filmId);
     }

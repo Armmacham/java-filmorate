@@ -14,9 +14,9 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.sql.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component("FilmDbStorage")
@@ -107,11 +107,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public boolean addLike(int filmId, int userId) {
         String sql = "select * from LIKES where USER_ID = ? and FILM_ID = ?";
-        SqlRowSet existLike = jdbcTemplate.queryForRowSet(sql, userId, filmId);
-        if (!existLike.next()) {
-            String setLike = "insert into LIKES (USER_ID, FILM_ID) values (?, ?) ";
-            jdbcTemplate.update(setLike, userId, filmId);
-        }
+        String setLike = "insert into LIKES (USER_ID, FILM_ID) values (?, ?) ";
+        jdbcTemplate.update(setLike, userId, filmId);
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, userId, filmId);
         log.info(String.valueOf(sqlRowSet.next()));
         return sqlRowSet.next();
@@ -153,8 +150,8 @@ public class FilmDbStorage implements FilmStorage {
                 getFilmLikes(filmId));
     }
 
-    private List<Integer> getFilmLikes(int filmId) {
+    private Set<Integer> getFilmLikes(int filmId) {
         String sqlGetLikes = "select USER_ID from LIKES where FILM_ID = ?";
-        return jdbcTemplate.queryForList(sqlGetLikes, Integer.class, filmId);
+        return new HashSet<>(jdbcTemplate.queryForList(sqlGetLikes, Integer.class, filmId));
     }
 }

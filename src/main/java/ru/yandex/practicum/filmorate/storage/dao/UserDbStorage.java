@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.sql.*;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component("UserDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -85,12 +86,16 @@ public class UserDbStorage implements UserStorage {
                 resultSet.getString("login"),
                 resultSet.getString("name"),
                 Objects.requireNonNull(resultSet.getDate("birthday")).toLocalDate(),
-                getUserFriends(userId));
+                getUserFriends(userId).stream().map(User::getId).collect(Collectors.toList()));
     }
 
-    private List<Integer> getUserFriends(Integer userId) {
-        String sqlGetFriends = "select FRIEND_ID from FRIENDSHIP where USER_ID = ?";
-        return jdbcTemplate.queryForList(sqlGetFriends, Integer.class, userId);
+    @Override
+    public List<User> getUserFriends(Integer id) {
+        String sql = "select u.* " +
+                "from FRIENDSHIP f " +
+                "         inner join USERS U on U.USER_ID = f.FRIEND_ID " +
+                "WHERE f.USER_ID = ?;";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
     }
 
     @Override

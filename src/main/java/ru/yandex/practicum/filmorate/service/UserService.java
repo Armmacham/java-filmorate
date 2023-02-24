@@ -72,16 +72,7 @@ public class UserService {
     }
 
     public List<User> getUserFriends(final Integer userId) {
-        User user = userStorage.getUserById(userId);
-
-        List<User> usersList = userStorage.getAllUsers();
-
-        Map<Integer, User> usersMap = usersList.stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
-        return user.getFriends()
-                .stream()
-                .map(usersMap::get)
-                .collect(Collectors.toList());
+        return userStorage.getUserFriends(userId);
     }
 
     public List<User> getMutualFriends(final Integer firstUserId, final Integer secondUserId) {
