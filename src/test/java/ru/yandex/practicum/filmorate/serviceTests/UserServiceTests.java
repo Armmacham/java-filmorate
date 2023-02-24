@@ -115,7 +115,7 @@ class UserServiceTests {
     void shouldAddFriend() {
         User user_1 = new User(0,
                 "correct_email@mail.ru",
-                "correct_login",
+                "correct_login_1",
                 "Correct_name",
                 LocalDate.of(2002, 1, 1),
                 new ArrayList<>());
