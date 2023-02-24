@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +38,7 @@ class FilmDbStorageTests {
                 3,
                 new Mpa(1, "o", "o"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Integer film1 = filmDbStorage.addFilm(film);
 
@@ -54,7 +55,7 @@ class FilmDbStorageTests {
                 3,
                 new Mpa(1, "Name", "Description"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Film film_2 = new Film(2, "Film_2", "Description_2",
                 LocalDate.now().minusYears(15),
@@ -62,7 +63,7 @@ class FilmDbStorageTests {
                 2,
                 new Mpa(3, "o", "o"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Integer film1_added = filmDbStorage.addFilm(film_1);
         Integer film2_added = filmDbStorage.addFilm(film_2);
@@ -81,7 +82,7 @@ class FilmDbStorageTests {
                 3,
                 new Mpa(1, "o", "o"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Integer filmId = filmDbStorage.addFilm(film);
         Film addedFilm = filmDbStorage.getFilmById(filmId);
@@ -100,7 +101,7 @@ class FilmDbStorageTests {
                 3,
                 new Mpa(1, "Name", "Description"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Film film_2 = new Film(2, "Film_2", "Description_2",
                 LocalDate.now().minusYears(15),
@@ -108,7 +109,7 @@ class FilmDbStorageTests {
                 2,
                 new Mpa(3, "o", "o"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Integer film1 = filmDbStorage.addFilm(film_1);
         Integer film2 = filmDbStorage.addFilm(film_2);
@@ -129,7 +130,7 @@ class FilmDbStorageTests {
                 3,
                 new Mpa(1, "Name", "Description"),
                 new ArrayList<>(),
-                new ArrayList<>());
+                new HashSet<>());
 
         Integer film1 = filmDbStorage.addFilm(film_1);
 
