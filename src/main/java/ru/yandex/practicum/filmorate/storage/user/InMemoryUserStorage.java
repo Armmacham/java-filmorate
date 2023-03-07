@@ -10,9 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Getter
 public class InMemoryUserStorage implements UserStorage {
-    public Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     public static int id;
 
@@ -21,14 +20,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) {
+    public int addUser(User user) {
         if (users.containsKey(user.getId())) {
             throw new EntityAlreadyExistsException(String.format("Пользователь с id номером %d уже существует", user.getId()));
         }
         int newId = generateId();
         user.setId(newId);
         users.put(newId, user);
-        return user;
+        return user.getId();
     }
 
     @Override
@@ -52,8 +51,35 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
+    @Override
+    public List<User> getUserFriends(Integer id) {
+        return List.of();
+    }
+
     public List<User> getAllUsers() {
         List<User> allUsers = new ArrayList<>(users.values());
         return allUsers;
+    }
+
+    @Override
+    public boolean deleteUserById(int id) {
+        users.remove(id);
+        return true;
+    }
+
+    @Override
+    public boolean addFriend(int userId, int friendId) {
+        User user = users.get(userId);
+        User friend = users.get(friendId);
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+        updateUser(user);
+        updateUser(friend);
+        return true;
+    }
+
+    @Override
+    public boolean deleteFriend(int userId, int friendId) {
+        return false;
     }
 }

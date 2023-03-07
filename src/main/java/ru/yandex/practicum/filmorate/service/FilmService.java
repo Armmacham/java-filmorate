@@ -1,48 +1,71 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.ValidationException;
-import java.time.LocalDate;
+import javax.validation.Validator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
 
-    private static final LocalDate START_DATA = LocalDate.of(1895, 12, 28);
+    private final GenreService genreService;
+    private final Validator validator;
+
+    @Autowired
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Autowired(required = false) UserService userService, GenreService genreService, Validator validator) {
+        this.filmStorage = filmStorage;
+        this.userService = userService;
+        this.genreService = genreService;
+        this.validator = validator;
+    }
 
     public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+//        if (validator.validate(film).size() > 0 || validator.validate(film.getGenres()).size() > 0) {
+//            throw new ValidationException();
+//        }
+        Integer film1 = filmStorage.addFilm(film);
+        genreService.addFilmGenres(film1, film.getGenres());
+        Film filmById = filmStorage.getFilmById(film1);
+        filmById.setGenres(genreService.getFilmGenres(film1));
+        return filmById;
     }
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        List<Film> allFilms = filmStorage.getAllFilms();
+        allFilms.forEach(f -> f.setGenres(genreService.getFilmGenres(f.getId())));
+        return allFilms;
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.update(film);
+        Film updated = filmStorage.update(film);
+        genreService.deleteFilmGenres(film.getId());
+        if (!film.getGenres().isEmpty()) {
+            genreService.addFilmGenres(film.getId(), film.getGenres());
+        }
+        updated.setGenres(genreService.getFilmGenres(updated.getId()));
+        return updated;
     }
 
     public Film getFilmById(Integer filmId) {
-        return filmStorage.getFilmById(filmId);
+        Film filmById = filmStorage.getFilmById(filmId);
+        filmById.setGenres(genreService.getFilmGenres(filmById.getId()));
+        return filmById;
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        userStorage.getUserById(userId);
-        getFilmById(filmId).addLike(userId);
+        filmStorage.addLike(filmId, userId);
         log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, filmId);
     }
 
@@ -52,6 +75,7 @@ public class FilmService {
             throw new EntityNotFoundException(String.format("Лайк пользователя с id номером %d не найден", userId));
         }
         film.removeLike(userId);
+        filmStorage.deleteLike(filmId, userId);
         log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, filmId);
     }
 
@@ -59,15 +83,10 @@ public class FilmService {
         return getAllFilms()
                 .stream()
                 .filter(film -> film.getLikesCount() != null)
+                .peek(film -> genreService.getFilmGenres(film.getId()))
                 .sorted((t1, t2) -> t2.getLikesCount().size() - t1.getLikesCount().size())
                 .limit(count)
                 .collect(Collectors.toList());
     }
-
-    public void validateReleaseDate(Film film, String text) {
-        if (film.getReleaseDate().isBefore(START_DATA)) {
-            throw new ValidationException("Дата релиза не может быть раньше " + START_DATA);
-        }
-        log.debug("{}: {}", text, film.getName());
-    }
 }
+

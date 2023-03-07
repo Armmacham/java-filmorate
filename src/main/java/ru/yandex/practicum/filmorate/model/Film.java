@@ -1,19 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.ToString;
+import lombok.*;
 import ru.yandex.practicum.filmorate.annotations.CorrectReleaseDate;
-import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @ToString
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Film {
 
     @PositiveOrZero(message = "id cant not be negative")
@@ -31,15 +33,16 @@ public class Film {
     @PositiveOrZero(message = "duration can not be negative")
     private int duration;
 
-    private Set<Integer> likesCount;
+    @NotNull
+    private int rating;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, Set<Integer> likesCount) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.likesCount = Objects.requireNonNullElseGet(likesCount, HashSet::new);
-    }
+    private Mpa mpa;
+
+    @Valid
+    private List<Genre> genres = new ArrayList<>();
+
+    private Set<Integer> likesCount = new HashSet<>();
+
 
     public void addLike(Integer userId) {
         likesCount.add(userId);
